@@ -6,8 +6,8 @@ set(CMAKE_C_STANDARD 11)
 include_directories(/usr/local/include)
 link_directories(/usr/local/lib)
 
-add_library(dc_fsm STATIC fsm.c)
-target_compile_options(dc_fsm PRIVATE -Wpedantic -Wall -Wextra)
+add_library(dcfsm STATIC fsm.c)
+target_compile_options(dcfsm PRIVATE -Wpedantic -Wall -Wextra)
 
-install(TARGETS dc_fsm DESTINATION lib)
-install(FILES fsm.h DESTINATION include/dc_fsm)
+install(TARGETS dcfsm DESTINATION lib)
+install(FILES fsm.h DESTINATION include/dcfsm)

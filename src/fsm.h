@@ -18,26 +18,52 @@
  */
 
 
-typedef struct
+#include <stdbool.h>
+
+
+/**
+ * Generic environment.
+ *
+ * Used to store variables for a finite state machine to pass to state functions.
+ */
+struct dc_fsm_environment
 {
-    int from_state_id;
-    int current_state_id;
-} Environment;
+    int from_state_id;    /**< What state is being move from. */
+    int current_state_id; /**< What state is being move to. */
+};
 
 
-typedef int (*state_func)(Environment *env);
+typedef int (*state_func)(struct dc_fsm_environment *env);
 
 
-typedef struct
+/**
+ * Represents moving from a state to another state and what function to call
+ * when the transition happens.
+ */
+struct state_transition
 {
     int from_id;
     int to_id;
     state_func perform;
-} StateTransition;
+};
 
 
-int fsm_run(Environment *env, int *from_id, int *to_id, const StateTransition transitions[]);
+/**
+ * Run the FSM from the from_id state moving into the to_id state.
+ *
+ * @param env the environment that the FSM uses to store data.
+ * @param from_id the state to move from, will store the second to last state
+ * @param to_id the state to move to, will store the last state
+ * @param transitions the list of state transitions
+ * @param verbose print the transitions
+ * @return -1 for failure, 0 for success
+ */
+int dc_fsm_run(struct dc_fsm_environment *env, int *from_id, int *to_id, const struct state_transition transitions[], bool verbose);
 
+
+/**
+ * The standard states that all FSM support.
+ */
 typedef enum
 {
     FSM_IGNORE = -1,

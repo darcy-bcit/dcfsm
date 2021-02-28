@@ -15,9 +15,9 @@
  */
 
 
+#include <dcfsm/fsm.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <dcfsm/fsm.h>
 
 
 static int read_input(Environment *env);
@@ -71,6 +71,8 @@ int main(int argc, char *argv[])
 
 //    fprintf(stderr, "Exiting state %d\n", start_state);
 
+    (void)argv;
+
     return EXIT_SUCCESS;
 }
 
@@ -114,12 +116,16 @@ _Noreturn static int read_error(Environment *env)
 {
     perror("getc");
 
+    (void)env;
+
     exit(EXIT_FAILURE);
 }
 
 _Noreturn static int write_error(Environment *env)
 {
     perror("putc");
+
+    (void)env;
 
     exit(EXIT_FAILURE);
 }

@@ -19,10 +19,10 @@
 #include <stdio.h>
 
 
-static state_func fsm_transition(int from_id, int to_id, const StateTransition transitions[]);
+static state_func fsm_transition(int from_id, int to_id, const struct state_transition transitions[]);
 
 
-int fsm_run(Environment *env, int *from_state_id, int *to_state_id, const StateTransition transitions[])
+int dc_fsm_run(struct dc_fsm_environment *env, int *from_state_id, int *to_state_id, const struct state_transition transitions[], bool verbose)
 {
     int from_id;
     int to_id;
@@ -43,10 +43,16 @@ int fsm_run(Environment *env, int *from_state_id, int *to_state_id, const StateT
             return -1;
         }
 
-        env->from_state_id     = from_id;
-        env->current_state_id  = to_id;
-        from_id                = to_id;
-        to_id                  = perform(env);
+        env->from_state_id    = from_id;
+        env->current_state_id = to_id;
+        from_id               = to_id;
+
+        if(verbose)
+        {
+            printf("Moving from %d to %d\n", env->from_state_id, env->current_state_id);
+        }
+
+        to_id = perform(env);
     }
     while(to_id != FSM_EXIT);
 
@@ -56,9 +62,9 @@ int fsm_run(Environment *env, int *from_state_id, int *to_state_id, const StateT
     return 0;
 }
 
-static state_func fsm_transition(int from_id, int to_id, const StateTransition transitions[])
+static state_func fsm_transition(int from_id, int to_id, const struct state_transition transitions[])
 {
-    const StateTransition *transition;
+    const struct state_transition *transition;
 
     transition = &transitions[0];
 

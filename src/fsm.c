@@ -28,7 +28,7 @@ int dc_fsm_run(struct dc_fsm_environment *env, int *from_state_id, int *to_state
     int to_id;
 
     from_id = *from_state_id;
-    to_id = *to_state_id;
+    to_id   = *to_state_id;
 
     do
     {
@@ -49,7 +49,7 @@ int dc_fsm_run(struct dc_fsm_environment *env, int *from_state_id, int *to_state
 
         if(verbose)
         {
-            printf("Moving from %d to %d\n", env->from_state_id, env->current_state_id);
+            printf("%s moving from %d to %d\n", env->name, env->from_state_id, env->current_state_id);
         }
 
         to_id = perform(env);

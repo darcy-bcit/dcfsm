@@ -28,8 +28,9 @@
  */
 struct dc_fsm_environment
 {
-    int from_state_id;    /**< What state is being move from. */
-    int current_state_id; /**< What state is being move to. */
+    const char *name;     /**< Name of the FSM. */
+    int from_state_id;    /**< What state is being moved from. */
+    int current_state_id; /**< What state is being moved to. */
 };
 
 

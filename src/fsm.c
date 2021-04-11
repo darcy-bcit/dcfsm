@@ -40,6 +40,8 @@ int dc_fsm_run(struct dc_fsm_environment *env, int *from_state_id, int *to_state
         {
             *from_state_id = from_id;
             *to_state_id   = to_id;
+            printf("%s error moving from %d to %d\n", env->name, from_id, to_id);
+
             return -1;
         }
 

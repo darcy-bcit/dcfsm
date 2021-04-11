@@ -15,15 +15,22 @@
  */
 
 
-#include <dcfsm/fsm.h>
+#include <dc_fsm/fsm.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 
-static int read_input(Environment *env);
-static int write_output(Environment *env);
-_Noreturn static int read_error(Environment *env);
-_Noreturn static int write_error(Environment *env);
+struct echo_environment
+{
+    struct dc_fsm_environment common;
+    int c;
+};
+
+
+static int read_input(struct echo_environment *env);
+static int write_output(struct echo_environment *env);
+_Noreturn static int read_error(struct echo_environment *env);
+_Noreturn static int write_error(struct echo_environment *env);
 
 
 typedef enum
@@ -34,33 +41,27 @@ typedef enum
 } States;
 
 
-typedef struct
-{
-    Environment common;
-    int c;
-} EchoEnvironment;
-
-
 int main(int argc, char *argv[])
 {
-    EchoEnvironment env;
-    StateTransition transitions[] =
+    struct echo_environment env;
+    struct state_transition transitions[] =
     {
-            { FSM_INIT,   READ,       &read_input   },
-            { READ,       ERROR,      &read_error   },
-            { READ,       WRITE,      &write_output },
-            { READ,       FSM_EXIT,   NULL          },
-            { WRITE,      ERROR,      &write_error  },
-            { WRITE,      READ,       &read_input   },
-            { FSM_IGNORE, FSM_IGNORE, NULL          },
+            { FSM_INIT,   READ,       (state_func)&read_input   },
+            { READ,       ERROR,      (state_func)&read_error   },
+            { READ,       WRITE,      (state_func)&write_output },
+            { READ,       FSM_EXIT,   (state_func)NULL          },
+            { WRITE,      ERROR,      (state_func)&write_error  },
+            { WRITE,      READ,       (state_func)&read_input   },
+            { FSM_IGNORE, FSM_IGNORE, (state_func)NULL          },
     };
     int code;
     int start_state;
     int end_state;
 
+    env.common.name = "echo";
     start_state = FSM_INIT;
     end_state   = READ;
-    code = fsm_run((Environment *)&env, &start_state, &end_state, transitions);
+    code = dc_fsm_run((struct dc_fsm_environment *)&env, &start_state, &end_state, transitions, false);
 
     if(code != 0)
     {
@@ -71,19 +72,17 @@ int main(int argc, char *argv[])
 
 //    fprintf(stderr, "Exiting state %d\n", start_state);
 
+    (void)argc;
     (void)argv;
 
     return EXIT_SUCCESS;
 }
 
-static int read_input(Environment *env)
+static int read_input(struct echo_environment *env)
 {
-    EchoEnvironment *echo_env;
+    env->c = getchar();
 
-    echo_env = (EchoEnvironment *)env;
-    echo_env->c = getchar();
-
-    if(echo_env->c == EOF)
+    if(env->c == EOF)
     {
         if(ferror(stdin))
         {
@@ -96,13 +95,11 @@ static int read_input(Environment *env)
     return WRITE;
 }
 
-static int write_output(Environment *env)
+static int write_output(struct echo_environment *env)
 {
-    EchoEnvironment *echo_env;
-    int              ret_val;
+    int ret_val;
 
-    echo_env = (EchoEnvironment *)env;
-    ret_val = putchar(echo_env->c);
+    ret_val = putchar(env->c);
 
     if(ret_val == EOF)
     {
@@ -112,7 +109,7 @@ static int write_output(Environment *env)
     return READ;
 }
 
-_Noreturn static int read_error(Environment *env)
+_Noreturn static int read_error(struct echo_environment *env)
 {
     perror("getc");
 
@@ -121,7 +118,7 @@ _Noreturn static int read_error(Environment *env)
     exit(EXIT_FAILURE);
 }
 
-_Noreturn static int write_error(Environment *env)
+_Noreturn static int write_error(struct echo_environment *env)
 {
     perror("putc");
 

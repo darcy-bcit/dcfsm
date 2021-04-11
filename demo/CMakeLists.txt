@@ -7,6 +7,6 @@ include_directories(/usr/local/include)
 link_directories(/usr/local/lib)
 
 add_executable(dcecho demo.c)
-target_link_libraries(dcecho dcfsm)
+target_link_libraries(dcecho dc_fsm)
 target_compile_options(dcecho PRIVATE -Wpedantic -Wall -Wextra)
 
